@@ -1,1 +1,1 @@
-The Excel like formula engine
+the Excel-like formula calculator
