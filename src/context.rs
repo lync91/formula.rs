@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use crate::{
     error::{EvalError, EvalResult},
-    function::Function,
     value::{value_type::ValueType, Value},
 };
 

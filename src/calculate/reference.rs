@@ -8,10 +8,9 @@ pub fn calculate_reference(r: &str, f: Option<&impl Fn(&str) -> Value>) -> Value
     match f {
         Some(f) => match f(r) {
             Value::Number(x) => Value::Number(x),
-            Value::Text(s) => calculate_formula(
-                parser::parse_string_to_formula(&s, None::<NoCustomFunction>),
-                Some(f),
-            ),
+            Value::Text(s) => {
+                calculate_formula(parser::parse_formula(&s, None::<NoCustomFunction>), Some(f))
+            }
             Value::Boolean(x) => Value::Boolean(x),
             Value::Error(ValueError::Value) => Value::Error(ValueError::Value),
             Value::Iterator(v) => Value::Iterator(v),

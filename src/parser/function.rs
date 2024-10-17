@@ -1,4 +1,3 @@
-/// Defines Excel Functions.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Function {
     Abs,
