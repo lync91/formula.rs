@@ -1,10 +1,10 @@
-extern crate formula;
-use formula::calculate;
-use formula::error::ValueError;
-use formula::value::Boolean;
-use formula::value::Value;
-use formula::NoCustomFunction;
-use formula::NoReference;
+extern crate xfeval;
+use xfeval::calculate;
+use xfeval::error::ValueError;
+use xfeval::value::Boolean;
+use xfeval::value::Value;
+use xfeval::NoCustomFunction;
+use xfeval::NoReference;
 
 use chrono::format::ParseError;
 use chrono::{DateTime, Duration, FixedOffset};
@@ -12,25 +12,25 @@ use chrono::{DateTime, Duration, FixedOffset};
 use assert_approx_eq::assert_approx_eq;
 
 fn evaluate_formula_number(s: &str) -> f64 {
-    let formula = formula::parse_string_to_formula(s, None::<NoCustomFunction>);
+    let formula = xfeval::parse_string_to_formula(s, None::<NoCustomFunction>);
     let result = calculate::calculate_formula(formula, None::<NoReference>);
     calculate::result_to_string(result).parse::<f64>().unwrap()
 }
 
 fn evaluate_formula_string(s: &str) -> String {
-    let formula = formula::parse_string_to_formula(s, None::<NoCustomFunction>);
+    let formula = xfeval::parse_string_to_formula(s, None::<NoCustomFunction>);
     let result = calculate::calculate_formula(formula, None::<NoReference>);
     calculate::result_to_string(result)
 }
 
 fn evaluate_formula_string_with_reference(s: &str, f: Option<&impl Fn(&str) -> Value>) -> String {
-    let formula = formula::parse_string_to_formula(s, None::<NoCustomFunction>);
+    let formula = xfeval::parse_string_to_formula(s, None::<NoCustomFunction>);
     let result = calculate::calculate_formula(formula, f);
     calculate::result_to_string(result)
 }
 
 fn evaluate_formula_number_with_reference(s: &str, f: Option<&impl Fn(&str) -> Value>) -> f32 {
-    let formula = formula::parse_string_to_formula(s, None::<NoCustomFunction>);
+    let formula = xfeval::parse_string_to_formula(s, None::<NoCustomFunction>);
     let result = calculate::calculate_formula(formula, f);
     calculate::result_to_string(result).parse::<f32>().unwrap()
 }
@@ -39,20 +39,20 @@ fn evaluate_formula_number_with_reference_no_conversion(
     s: &str,
     f: Option<&impl Fn(&str) -> Value>,
 ) -> Value {
-    let formula = formula::parse_string_to_formula(s, None::<NoCustomFunction>);
+    let formula = xfeval::parse_string_to_formula(s, None::<NoCustomFunction>);
     let result = calculate::calculate_formula(formula, f);
     result
     //calculate::result_to_string(result).parse::<f32>().unwrap()
 }
 
 fn evaluate_formula_boolean_with_reference(s: &str, f: Option<&impl Fn(&str) -> Value>) -> String {
-    let formula = formula::parse_string_to_formula(s, None::<NoCustomFunction>);
+    let formula = xfeval::parse_string_to_formula(s, None::<NoCustomFunction>);
     let result = calculate::calculate_formula(formula, f);
     calculate::result_to_string(result) //.parse::<f32>().unwrap()
 }
 
 fn evaluate_formula_date_with_reference(s: &str, f: Option<&impl Fn(&str) -> Value>) -> String {
-    let formula = formula::parse_string_to_formula(s, None::<NoCustomFunction>);
+    let formula = xfeval::parse_string_to_formula(s, None::<NoCustomFunction>);
     let result = calculate::calculate_formula(formula, f);
     calculate::result_to_string(result)
 }
@@ -62,7 +62,7 @@ fn evaluate_formula_number_with_custom_function(
     custom_function: Option<&impl Fn(&str, Vec<f64>) -> Value>,
     //reference: Option<&impl Fn(&str) -> Value>,
 ) -> f64 {
-    let formula = formula::parse_string_to_formula(s, custom_function);
+    let formula = xfeval::parse_string_to_formula(s, custom_function);
     let result = calculate::calculate_formula(formula, None::<NoReference>);
     result.try_into().unwrap()
 }
@@ -72,7 +72,7 @@ fn evaluate_formula_string_with_custom_function(
     custom_function: Option<&impl Fn(&str, Vec<f64>) -> Value>,
     //reference: Option<&impl Fn(&str) -> Value>,
 ) -> String {
-    let formula = formula::parse_string_to_formula(s, custom_function);
+    let formula = xfeval::parse_string_to_formula(s, custom_function);
     let result = calculate::calculate_formula(formula, None::<NoReference>);
     calculate::result_to_string(result)
 }
@@ -82,7 +82,7 @@ fn _evaluate_formula_number_with_custom_function_and_reference(
     custom_function: Option<&impl Fn(&str, Vec<f64>) -> Value>,
     reference: Option<&impl Fn(&str) -> Value>,
 ) -> f32 {
-    let formula = formula::parse_string_to_formula(s, custom_function);
+    let formula = xfeval::parse_string_to_formula(s, custom_function);
     let result = calculate::calculate_formula(formula, reference);
     calculate::result_to_string(result).parse::<f32>().unwrap()
 }

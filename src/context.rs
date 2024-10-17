@@ -33,7 +33,7 @@ pub trait ContextWithMutableVariables: Context {
 #[derive(Clone, Debug, Default)]
 pub struct HashMapContext {
     variables: HashMap<String, Value>,
-    functions: HashMap<String, Function>,
+    // functions: HashMap<String, Function>,
     /// True if builtin functions are disabled.
     without_builtin_functions: bool,
 }
