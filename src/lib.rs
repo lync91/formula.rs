@@ -40,36 +40,52 @@ pub fn evaluate(expression: &str, context: HashMapContext) -> Value {
 mod test {
 
     use super::*;
-    use calculate::utils;
-    use chrono::{DateTime, Utc};
+    use chrono::DateTime;
     use context::ContextWithMutableVariables;
     use error::ValueError;
     use value::Value;
 
-    // #[test]
-    // fn test_date_functions() {
-    //     use chrono::{DateTime, FixedOffset};
+    #[test]
+    fn test_simple_formula() {
+        let formula = parser::parse_string_to_formula(&"=1+1", None::<NoCustomFunction>);
+        let result = calculate::calculate_formula(formula, None::<NoReference>);
+        assert_eq!(result.str_from().as_str(), "2");
+    }
 
-    //     let start: DateTime<FixedOffset> = DateTime::parse_from_rfc3339("2019-03-01T02:00:00.000Z").unwrap();
-    //     let end: DateTime<FixedOffset> = DateTime::parse_from_rfc3339("2019-08-30T02:00:00.000Z").unwrap();
-    //     let data_function = |s: String| match s.as_str() {
-    //         "start" => Value::Date(start),
-    //         "end" => Value::Date(end),
-    //         _ => Value::Error(ValueError::Value),
-    //     };
+    #[test]
+    fn test_complex_formula() {
+        let formula = parser::parse_string_to_formula(&"=(1+1)*2", None::<NoCustomFunction>);
+        let result = calculate::calculate_formula(formula, None::<NoReference>);
+        assert_eq!(result.str_from().as_str(), "4");
+    }
 
-    //     let formula = parser::parse_string_to_formula(&"=DAYS(end, start)", None::<NoCustomFunction>);
-    //     let result = calculate::calculate_formula(formula, Some(&data_function));
-    //     assert_eq!(result.str_from().as_str(), "182");
+    #[test]
+    fn test_date_functions() {
+        use chrono::{DateTime, FixedOffset};
 
-    //     let formula = parser::parse_string_to_formula(&"=start+1", None::<NoCustomFunction>);
-    //     let result = calculate::calculate_formula(formula, Some(&data_function));
-    //     assert!(result.str_from().as_str().contains("2019-03-02"));
+        let start: DateTime<FixedOffset> =
+            DateTime::parse_from_rfc3339("2019-03-01T02:00:00.000Z").unwrap();
+        let end: DateTime<FixedOffset> =
+            DateTime::parse_from_rfc3339("2019-08-30T02:00:00.000Z").unwrap();
+        let data_function = |s: &str| match s {
+            "start" => Value::Date(start),
+            "end" => Value::Date(end),
+            _ => Value::Error(ValueError::Value),
+        };
 
-    //     let formula = parser::parse_string_to_formula(&"=end-3", None::<NoCustomFunction>);
-    //     let result = calculate::calculate_formula(formula, Some(&data_function));
-    //     assert!(result.str_from().as_str().contains("2019-08-27"));
-    // }
+        let formula =
+            parser::parse_string_to_formula(&"=DAYS(end, start)", None::<NoCustomFunction>);
+        let result = calculate::calculate_formula(formula, Some(&data_function));
+        assert_eq!(result.str_from().as_str(), "182");
+
+        let formula = parser::parse_string_to_formula(&"=start+1", None::<NoCustomFunction>);
+        let result = calculate::calculate_formula(formula, Some(&data_function));
+        assert!(result.str_from().as_str().contains("2019-03-02"));
+
+        let formula = parser::parse_string_to_formula(&"=end-3", None::<NoCustomFunction>);
+        let result = calculate::calculate_formula(formula, Some(&data_function));
+        assert!(result.str_from().as_str().contains("2019-08-27"));
+    }
 
     #[test]
     fn test_custom_function() {
