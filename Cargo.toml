@@ -4,3 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+chrono = { version = "0.4.38", features = ["serde"] }
+pest = "2.5"
+pest_derive = "2.5"
+rust_decimal = "1.36.0"
+serde = "1.0.210"
+serde_derive = "1.0.210"
+assert_approx_eq = "1.1.0"

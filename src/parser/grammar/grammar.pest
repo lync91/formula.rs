@@ -1,0 +1,226 @@
+// Định nghĩa số (number), bao gồm số nguyên (int) và số thập phân (có thể có phần thập phân).
+number = @{ int ~ ("." ~ ASCII_DIGIT*)? }
+
+// Định nghĩa số nguyên (int), có thể có dấu cộng (+) hoặc trừ (-) và ít nhất một chữ số.
+int = { ("+" | "-")? ~ ASCII_DIGIT+ }
+
+// Định nghĩa chuỗi (string) được bao bởi dấu ngoặc kép (").
+string_double_quote = ${ "\"" ~ str_inner_double ~ "\"" }
+
+// Định nghĩa nội dung chuỗi bên trong dấu ngoặc kép (").
+str_inner_double = @{ char_double* }
+
+// Định nghĩa một ký tự trong chuỗi dấu ngoặc kép, có thể là bất kỳ ký tự nào ngoại trừ dấu ngoặc kép (").
+char_double = {
+    !("\"") ~ ANY
+  | "\"" ~ ("\"")
+}
+
+// Định nghĩa chuỗi (string) được bao bởi dấu nháy đơn (').
+string_single_quote = ${ "\'" ~ str_inner_single ~ "\'" }
+
+// Định nghĩa nội dung chuỗi bên trong dấu nháy đơn (').
+str_inner_single = @{ char_single* }
+
+// Định nghĩa một ký tự trong chuỗi dấu nháy đơn, có thể là bất kỳ ký tự nào ngoại trừ dấu nháy đơn (').
+char_single = { !("\'") ~ ANY }
+
+// Định nghĩa chuỗi hằng số (constant string).
+string_constant = ${ str_inner_constant }
+
+// Định nghĩa nội dung chuỗi hằng số.
+str_inner_constant = @{ char_constant* }
+
+// Định nghĩa một ký tự trong chuỗi hằng số, có thể là bất kỳ ký tự nào ngoại trừ dấu bằng (=).
+char_constant = {
+    "\'" ~ ("=")
+  | !("=") ~ ANY
+}
+
+// Định nghĩa các toán tử (operator), bao gồm toán tử số học, toán tử chuỗi và toán tử logic.
+operator = _{ arithmetic_operator | string_operator | logical_operator }
+
+// Định nghĩa các toán tử số học (arithmetic_operator).
+arithmetic_operator = _{ add | subtract | multiply | divide | power }
+add                 =  { "+" }
+// Toán tử cộng (+)
+subtract = { "-" }
+// Toán tử trừ (-)
+multiply = { "*" }
+// Toán tử nhân (*)
+divide = { "/" }
+// Toán tử chia (/)
+power = { "^" }
+// Toán tử lũy thừa (^)
+
+// Định nghĩa toán tử chuỗi (string_operator).
+string_operator = _{ concat }
+concat          =  { "&" }
+// Toán tử nối chuỗi (&)
+
+// Định nghĩa các toán tử logic (logical_operator).
+logical_operator = _{
+    equal
+  | not_equal
+  | greater_or_equal
+  | greater
+  | less_or_equal
+  | less
+}
+equal            =  { "=" }
+// Toán tử bằng (=)
+not_equal = { "<>" }
+// Toán tử không bằng (<>)
+greater = { ">" }
+// Toán tử lớn hơn (>)
+less = { "<" }
+// Toán tử nhỏ hơn (<)
+greater_or_equal = { ">=" }
+// Toán tử lớn hơn hoặc bằng (>=)
+less_or_equal = { "<=" }
+// Toán tử nhỏ hơn hoặc bằng (<=)
+
+// Định nghĩa các hàm (function).
+function = _{ abs | sum | product | average | negate | days | right | left | iff | isblank | custom_function }
+abs      =  { "ABS" ~ "(" ~ expr ~ ")" }
+// Hàm trị tuyệt đối (ABS)
+sum = { "SUM" ~ function_param_with_atomic_expr }
+// Hàm tổng (SUM)
+product = { "PRODUCT" ~ function_param_with_atomic_expr }
+// Hàm tích (PRODUCT)
+average = { "AVERAGE" ~ function_param_with_atomic_expr }
+// Hàm trung bình (AVERAGE)
+negate = { "-" ~ (function_param | iterator | reference) }
+// Hàm phủ định (NEGATE)
+days = { "DAYS" ~ function_param }
+// Hàm tính ngày (DAYS)
+right = { "RIGHT" ~ function_param }
+// Hàm lấy chuỗi bên phải (RIGHT)
+left = { "LEFT" ~ function_param }
+// Hàm lấy chuỗi bên trái (LEFT)
+iff = { "IF" ~ three_params }
+// Hàm điều kiện (IF)
+isblank = { "ISBLANK" ~ function_param }
+
+// Hàm kiểm tra ô trống (ISBLANK)
+custom_function_name = { variable }
+custom_function      = { custom_function_name ~ (function_param | empty_param) }
+// Hàm tùy chỉnh (CUSTOM_FUNCTION)
+
+// Định nghĩa các hàm logic (logical_function).
+logical_function = _{ or | and | xor | not }
+or               =  { "OR" ~ function_param_with_atomic_expr }
+// Hàm OR
+and = { "AND" ~ function_param_with_atomic_expr }
+// Hàm AND
+xor = { "XOR" ~ function_param_with_atomic_expr }
+// Hàm XOR
+not = { "NOT" ~ "(" ~ expr ~ ")" }
+// Hàm NOT
+
+// Định nghĩa tham số hàm (function_param).
+function_param = _{ "(" ~ expr ~ ("," ~ expr)*? ~ ")" }
+
+// Định nghĩa tham số hàm rỗng (empty_param).
+empty_param = { "(" ~ ")" }
+
+// Định nghĩa tham số hàm với biểu thức nguyên tử (function_param_with_atomic_expr).
+function_param_with_atomic_expr = _{ "(" ~ param_inner? ~ param_with_blank*? ~ ")" }
+
+// Định nghĩa hàm với ba tham số (three_params).
+three_params = _{
+    "(" ~ ")"
+  | "(" ~ first_param ~ param ~ param ~ ")"
+}
+
+// Định nghĩa biểu thức nguyên tử (atomic_expr).
+atomic_expr = ${ expr }
+
+// Định nghĩa tham số bên trong (param_inner).
+param_inner = _{ atomic_expr | expr }
+
+// Định nghĩa tham số đầu tiên (first_param).
+first_param = { param_inner? }
+
+// Định nghĩa tham số (param).
+param = { ","? ~ param_inner? }
+
+// Định nghĩa tham số với ô trống (param_with_blank).
+param_with_blank = _{ param1 | blank }
+
+// Định nghĩa ô trống (blank).
+blank = { "," }
+
+// Định nghĩa tham số (param1).
+param1 = { "," ~ param_inner }
+
+// Định nghĩa giá trị boolean (boolean).
+boolean = _{ t | f }
+t       =  { ("T" | "t") ~ ("R" | "r") ~ ("U" | "u") ~ ("E" | "e") }
+// TRUE
+f = { ("F" | "f") ~ ("A" | "a") ~ ("L" | "l") ~ ("S" | "s") ~ ("E" | "e") }
+// FALSE
+
+// Định nghĩa tham chiếu (reference).
+
+reference = { sheet_range | sheet_cell | range | cell | variable }
+
+variable = @{ (ASCII_ALPHA | "_" | "\\") ~ char_reference* }
+
+char_reference = { ASCII_ALPHANUMERIC | "." | "_" }
+
+// Định nghĩa sheet range.
+sheet_range = { sheet_reference ~ "!" ~ range }
+
+// Định nghĩa sheet cell.
+sheet_cell = ${ sheet_reference ~ "!" ~ cell }
+
+// Định nghĩa địa chỉ range (range_reference).
+range = { cell ~ ":" ~ cell }
+
+// Định nghĩa ô (cell).
+cell = ${ column ~ row }
+
+// Định nghĩa cột (column).
+column = _{ ASCII_ALPHA+ }
+
+// Định nghĩa hàng (row).
+row = _{ ASCII_DIGIT+ }
+
+// Định nghĩa sheet_reference (tham chiếu đến sheet).
+sheet_reference = { (normal_sheet_name | quoted_sheet_name) }
+
+normal_sheet_name = { (ASCII_ALPHA | "_" | "\\") ~ char_reference* }
+
+sheet_char_single = _{ !("\'") ~ ANY }
+
+sheet_name_inner = _{ sheet_char_single* }
+
+quoted_sheet_name = _{ "\'" ~ sheet_name_inner ~ "\'" }
+
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+
+// Định nghĩa vòng lặp (iterator).
+iterator = { "{" ~ expr ~ ("," ~ expr)*? ~ "}" }
+
+// Định nghĩa biểu thức (expr).
+expr = { term ~ (operator ~ term)* }
+
+// Định nghĩa các thuật ngữ (term).
+term = _{
+    number
+  | "(" ~ expr ~ ")"
+  | string_double_quote
+  | string_single_quote
+  | logical_function
+  | function
+  | boolean
+  | reference
+  | iterator
+}
+
+// Định nghĩa các thuật ngữ hằng số (term_constant).
+term_constant = _{ string_constant }
+
+// Định nghĩa công thức (formula).
+formula = _{ SOI ~ "=" ~ expr ~ EOI | SOI ~ term_constant ~ EOI }
